@@ -1,0 +1,20 @@
+Screen {
+    background:#242843;
+}
+
+GameView {
+  border: heavy white;
+  width: 70%;
+  height: 100%;
+}
+
+InventoryPanel {
+  border: heavy white;
+  width: 30%;
+  height: 100%;
+}
+
+LogPanel {
+  border: round teal;
+  height: 40%;
+}

@@ -1,10 +1,7 @@
-# Knowledge chains (acyclic directed graph):
-    # GoindAroundTheWorld -> Got80Days -> ItsABet
+from typing import Dict
 
-from game.npc import generate_rumor, NPCMemory
-
-NPCS = ["Cassandra", "Mildred", "Mr Whiskers", "Randy Hawthorne", "Michael"]
-LOCATIONS = ["cafe", "kitchen", "storage room", "attic", "cellar", "back alley", "park"]
+from gui.gui import GameApp
+from game.npc import generate_rumor, NPC
 
 FLAVOR_TEMPLATES = [
     "{subject} looked tired around {time_str}. Probably just didn’t sleep well.",
@@ -18,55 +15,16 @@ SUSPICIOUS_TEMPLATES = [
     "{subject} was muttering to themselves in the {location}. At {time_str}. Creepy."
 ]
 
-# Initialize NPC memories
-npc_memories = {name: NPCMemory(name=name) for name in NPCS}
-
-# Generate warmup rumors
-rumor_pool = []
-for _ in range(10):
-    rumor = generate_rumor(NPCS, LOCATIONS, FLAVOR_TEMPLATES, SUSPICIOUS_TEMPLATES)
-    rumor_pool.append(rumor)
-    npc_memories[rumor.source].seen_events.append(rumor)
-
-
-# Pretty print them
-from rich.console import Console
-from rich.table import Table
-
-def print_rumors_sorted(rumors):
-    console = Console()
-    table = Table(title="Rumor Warmup Pool")
-    table.add_column("Source", style="cyan")
-    table.add_column("Time", style="green")
-    table.add_column("Rumor", style="white")
-    table.add_column("certainty", style="magenta")
-
-    sorted_rumors = sorted(rumors, key=lambda r: (r.source, r.time))
-
-    for r in sorted_rumors:
-        table.add_row(
-            r.source, 
-            r.time.strftime("%D %H:%M"),
-            r.text, 
-            f"{r.certainty:.2f}"
-            )
-
-    console.print(table)
-
-print_rumors_sorted(rumor_pool)
-# print(rumor_pool[0])
-# mutatedRumor = mutate_rumor(rumor_pool[0], random.choice(NPCS))
-# print (mutatedRumor)
-# mutatedRumor = mutate_rumor(mutatedRumor, random.choice(NPCS))
-# print (mutatedRumor)
-# mutatedRumor = mutate_rumor(mutatedRumor, random.choice(NPCS))
-# print (mutatedRumor)
-
 # Create NPCs
-# npc_names = ["Felix", "Dana", "Harold", "Marla"]
-# npc_dict: Dict[str, NPC] = {name: NPC(name) for name in npc_names}
-#
-# # Define real event (monster/vampire action)
+npc_list = []
+npc_list.append(NPC("Cassandra", "🦊"))
+npc_list.append(NPC("Mr Whiskers", "🐈"))
+npc_list.append(NPC("Mildred", "🔮"))
+
+if __name__ == "__main__":
+    GameApp().run()
+
+# Define real event (monster/vampire action)
 # real_event = Rumor(
 #     source="Felix",
 #     subject="Marla",
@@ -76,7 +34,7 @@ print_rumors_sorted(rumor_pool)
 #     certainty=0.95,
 #     origin="Felix"
 # )
-# npc_dict["Felix"].beliefs.append(real_event)
+# npc_list["Felix"].beliefs.append(real_event)
 #
 # # Spread rumors through the network
 # rumor_chain = [real_event]
@@ -84,15 +42,31 @@ print_rumors_sorted(rumor_pool)
 # spread_order = ["Dana", "Harold"]
 #
 # for name in spread_order:
-#     npc = npc_dict[name]
+#     npc = npc_list[name]
 #     new_rumor = npc.spread_rumor(current_rumor)
 #     if new_rumor:
 #         rumor_chain.append(new_rumor)
 #         current_rumor = new_rumor
-#
+
+
+# Generate warmup rumors
+# rumor_pool = []
+# for _ in range(10):
+#     rumor = generate_rumor(npc_list, FLAVOR_TEMPLATES, SUSPICIOUS_TEMPLATES)
+#     rumor_pool.append(rumor)
+    # npc_list[rumor.source].seen_events.append(rumor)
+
+# print(rumor_pool[0])
+# mutatedRumor = mutate_rumor(rumor_pool[0], random.choice(NPCS))
+# print (mutatedRumor)
+# mutatedRumor = mutate_rumor(mutatedRumor, random.choice(NPCS))
+# print (mutatedRumor)
+# mutatedRumor = mutate_rumor(mutatedRumor, random.choice(NPCS))
+# print (mutatedRumor)
+
 # # Simulate interrogation
 # interrogation_results = {}
-# for npc in npc_dict.values():
+# for npc in npc_list.values():
 #     interrogation_results[npc.name] = npc.respond_to_interrogation()
 #
 # interrogation_results["rumor_chain"] = [f"{r.source} -> {r.event}" for r in rumor_chain]

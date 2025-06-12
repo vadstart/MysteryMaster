@@ -3,32 +3,41 @@
 import random
 import copy
 
+from enum import Enum
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 from uuid import uuid4
 from dataclasses import dataclass, field
 
+class eLocation(Enum):
+    CAFE = 0
+    KITCHEN = 1
+    CELLAR = 2
+    ATTIC = 3
+    ALLEY = 4
+    PARK = 5
 
 @dataclass
 class Rumor:
     id: str
-    source: str                 # NPC who is spreading the rumor
-    subject: str                # NPC the rumor is about
+    source: "NPC"                 # NPC who is spreading the rumor now
+    subject: "NPC"                # NPC the rumor is about
+    origin: "NPC"   # NPC who originated the rumor 
     event: str                  # e.g.,'sighting','hearsay', 'flavor'
-    location: str               # Where the event took place
+    location: eLocation               # Where the event took place
     time: datetime              # e.g., 'night', 'morning'
     text: str
     certainty: float             # How confident the speaker is
-    # origin: str
     is_true: Optional[bool] = None  # For debugging / tracking
 
 @dataclass
-class NPCMemory:
+class NPC:
     name: str
+    graphic: str
+    location: Optional[eLocation] = eLocation.CAFE
     seen_events: List[Rumor] = field(default_factory=list)
     heard_rumors: List[Rumor] = field(default_factory=list)
-    beliefs: Dict[str, bool] = field(default_factory=dict)  # e.g. {"Marla is suspicious": True}
-    is_vampire: bool = False
+    # beliefs: Dict[str, bool] = field(default_factory=dict)  # e.g. {"Marla is suspicious": True}
 
 def generate_random_time():
     # Simulate a time between 6 AM and 2 AM
@@ -36,12 +45,12 @@ def generate_random_time():
     minute = random.choice([0, 15, 30, 45])
     return datetime(2025, 6, 10, hour, minute)
 
-def generate_rumor(NPCS: List[str], LOCATIONS: List[str],
+def generate_rumor(NPCS: List[NPC],
                    FLAVOR_TEMPLATES: List[str], SUSPICIOUS_TEMPLATES: List[str]) -> Rumor:
     subject = random.choice(NPCS)
     source = random.choice([npc for npc in NPCS if npc != subject])
     time = generate_random_time()
-    location = random.choice(LOCATIONS)
+    location = random.choice(list(eLocation))
     other = random.choice([npc for npc in NPCS if npc != subject and npc != source])
     template = random.choice(SUSPICIOUS_TEMPLATES + FLAVOR_TEMPLATES)
     time_str = time.strftime("%H:%M")
@@ -51,6 +60,7 @@ def generate_rumor(NPCS: List[str], LOCATIONS: List[str],
         id=str(uuid4()),
         source=source,
         subject=subject,
+        origin=source,
         event="flavor" if "looked tired" in text else "sighting",
         location=location,
         time=time,
